@@ -18,6 +18,10 @@
   - notiflex 네임스페이스, Deployment(replicas 2), Service(ClusterIP 80→8080) 배포
   - Pod 2개 Running, `/health` 200 OK, `/id` 순차 ID 확인
 
+- ✅ 2.7 GitHub에 첫 커밋 — 2026-10-12
+  - 커밋 df6dd7c `Initial commit: Notiflex app, K8s manifests, CLAUDE.md, JOURNEY.md`
+  - origin/main에 푸시 (https://github.com/hyochangsung/notiflex-platform)
+
 ## 현재 버전
 - Notiflex 이미지: `v0.1.0`
 - Go: `1.25` (빌드 이미지 `golang:1.25-alpine`)
