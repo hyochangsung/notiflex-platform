@@ -4,27 +4,31 @@
 Notiflex — B2B 알림 SaaS 플랫폼. GitAIOps 책의 실습을 GCP 환경에서 진행한다.
 대화와 문서는 한국어로 작성한다.
 
-## 기술 스택과 진행 방향
-- 애플리케이션: Go 표준 라이브러리
+## 기술 스택
+- (애플리케이션: Go 표준 라이브러리만 사용, 외부 프레임워크 없음)
 - 컨테이너: scratch 베이스 이미지
-- 클라우드: Google Cloud (GCP)
-- Kubernetes: GKE Standard (Zonal), Spot VM 사용 예정
-- 이미지 레지스트리: Artifact Registry
-- GitOps: ArgoCD 사용 예정
+- 인프라: GKE Standard (Zonal)
+- CI/CD: Github Actions + ArgoCD 사용 예정
 
 ## GCP 설정
-2026-10-10 로컬 `gcloud config list` 확인 결과:
-- 프로젝트 ID: 미설정
-- 리전: 미설정 (책의 서울 리전 예시: asia-northeast3)
-- 존: 미설정
-- Artifact Registry 경로 형식: `asia-northeast3-docker.pkg.dev/<PROJECT_ID>/notiflex`
-- 실제 프로젝트와 리전, 존을 설정한 뒤 위 정보를 갱신한다.
-- 실제 Artifact Registry 저장소와 GKE 클러스터의 생성 여부는 아직 확인하지 않았다.
+- 프로젝트 ID: my-gitaiops-project-261010
+- 리전: asia-northeast3
+- 존: asia-northeast3-a
+- Artifact Registry 경로 형식: `asia-northeast3-docker.pkg.dev/my-gitaiops-project-261010/notiflex`
+- 프로젝트와 서울 리전·존 설정 완료 (2026-10-10).
+- GKE 클러스터: notiflex-cluster (asia-northeast3-a), 노드 2개 Ready 확인
+- 노드: e2-medium ×2, Spot VM, 부팅 디스크 각 30GB
+- Kubernetes 버전: 1.35.8-gke.1380001
+- 접속 컨텍스트: gke-sysnet4admin_book_gitaiops
+- Gateway API: CHANNEL_STANDARD 활성화, GatewayClass 4개 Accepted=True 확인
+- Artifact Registry 저장소 notiflex 생성 완료, 이미지 api:v0.1.0 푸시 (2026-10-12).
 
 ## 행동 규칙
-- 항상 확인 후 실행하며, 변경 전 현재 상태와 대상 프로젝트, 리전, 저장소를 확인한다.
-- 모든 kubectl 명령에는 책의 규칙대로 `--context gke-sysnet4admin_book_gitaiops`를 지정한다.
-- 실행 전에 해당 컨텍스트가 실제 실습용 GKE 클러스터를 가리키는지 확인한다. 컨텍스트가 없거나 대상이 다르면 실행하지 않고 설정을 먼저 확인한다.
-- 인증 정보와 토큰을 Git에 저장하지 않는다.
-- 확인한 구현과 예정 작업을 구분하여 기록한다.
-- 실습 완료 후 JOURNEY.md에 진행 상태를 기록한다.
+1. 명령 실행 전 현재 상태를 확인한다. (`kubectl get`, `gcloud config list 등)
+2. 파일 변경 전 기존 내용을 먼저 읽는다.
+3. 에러 발생 시 원인을 분석하고 해결 방안을 제시한 뒤 진행한다.
+4. 매니페스트 작성 시 네임스페이즈(`notiflex)를 명시한다.
+5. **모든 `kubectl` 명령에 `--context gke-sysnet4admin_book_gitaiops`를 반드시 지정한다** (잘못된 클러스터 대상 실행 방지)
+6. 리소스 생성/삭제 전에는 영향 범위를 먼저 설명한다.
+7. 이미지 태그는 `latest`를 쓰지 않고 명시적 버전(`v0.1.0` 등)을 사용한다.
+8. 토큰, 키 그리고 비밀번호는 코드/매니페스트에 하드코딩하지 않는다. (환경 변수, Github Secret, Secret Manager 사용)
